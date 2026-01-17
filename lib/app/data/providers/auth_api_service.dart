@@ -127,18 +127,31 @@ class AuthApiService {
     try {
       AppLogger.info('📝 Attempting signup for: $email');
 
-      final response = await _apiClient.post(
-        ApiConfig.register,
-        {
-          'email': email,
-          'password': password,
-          'firstName': firstName,
-          'lastName': lastName,
-          'gender': gender,
-          'profileType': profileType,
-        },
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await _apiClient.post(ApiConfig.register, {
+        'email': email,
+        'password': password,
+        'firstName': firstName,
+        'lastName': lastName,
+        'gender': gender,
+        'profileType': profileType,
+      });
+
+      AppLogger.info('📥 Signup response: ${response.statusCode}');
+      return response;
+    } catch (e) {
+      AppLogger.error('❌ Signup error: $e', e);
+      rethrow;
+    }
+  }
+
+  /// Sign up a new user with custom data
+  /// POST /public/signup
+  /// Body: JSON with user details (accepts Map for flexibility)
+  Future<Response> signUpWithData(Map<String, dynamic> data) async {
+    try {
+      AppLogger.info('📝 Attempting signup for: ${data['email']}');
+
+      final response = await _apiClient.post(ApiConfig.register, data);
 
       AppLogger.info('📥 Signup response: ${response.statusCode}');
       return response;

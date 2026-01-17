@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'app/core/theme/app_theme.dart';
-import 'app/core/values/app_strings.dart';
+import 'app/core/i18n/app_translations.dart';
+import 'app/core/i18n/translation_keys.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 
@@ -19,9 +20,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: AppStrings.appName,
+      title: TranslationKeys.appName.tr,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      // Internationalization
+      translations: AppTranslations(),
+      locale: const Locale('en', 'US'), // Default locale
+      fallbackLocale: const Locale('en', 'US'), // Fallback locale
       initialRoute: AppRoutes.splash,
       getPages: AppPages.pages,
     );

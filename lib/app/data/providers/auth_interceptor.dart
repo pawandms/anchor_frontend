@@ -19,6 +19,9 @@ class ApiClient extends GetConnect {
     // Set timeout
     httpClient.timeout = const Duration(seconds: 30);
 
+    // Set default content type
+    httpClient.defaultContentType = 'application/json';
+
     // Add request interceptor
     httpClient.addRequestModifier<dynamic>((request) async {
       // Add token to all requests except login/register

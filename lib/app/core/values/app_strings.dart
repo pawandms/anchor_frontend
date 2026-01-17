@@ -16,12 +16,36 @@ class AppStrings {
   static const String password = 'Password';
   static const String confirmPassword = 'Confirm Password';
   static const String fullName = 'Full Name';
+  static const String firstName = 'First Name';
+  static const String lastName = 'Last Name';
+  static const String userName = 'Username';
+  static const String userNameOptional = 'Username (Optional)';
+  static const String mobile = 'Mobile';
+  static const String mobileOptional = 'Mobile (Optional)';
+  static const String gender = 'Gender';
+  static const String genderOptional = 'Gender (Optional)';
+  static const String dateOfBirth = 'Date of Birth';
+  static const String dateOfBirthOptional = 'Date of Birth (Optional)';
+  static const String male = 'Male';
+  static const String female = 'Female';
+  static const String other = 'Other';
   static const String forgotPassword = 'Forgot Password?';
   static const String dontHaveAccount = "Don't have an account?";
   static const String alreadyHaveAccount = 'Already have an account?';
   static const String createAccount = 'Create Account';
   static const String welcomeBack = 'Welcome Back';
   static const String createYourAccount = 'Create your account';
+  static const String joinUsToStayConnected = 'Join us to stay connected';
+
+  // Hints
+  static const String enterYourFirstName = 'Enter your first name';
+  static const String enterYourLastName = 'Enter your last name';
+  static const String enterYourEmail = 'Enter your email';
+  static const String enterYourUsername = 'Enter your username';
+  static const String enterYourMobileNumber = 'Enter your mobile number';
+  static const String enterYourPassword = 'Enter your password';
+  static const String confirmYourPassword = 'Confirm your password';
+  static const String selectYourDateOfBirth = 'Select your date of birth';
 
   // Home
   static const String chats = 'Chats';
