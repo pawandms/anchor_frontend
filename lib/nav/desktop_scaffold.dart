@@ -10,6 +10,7 @@ import '../../shared/widgets/user_avatar.dart';
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/auth_client.dart';
 import '../../core/enums/user_presence_status.dart';
+import '../../shared/widgets/profile_menu_content.dart';
 
 class DesktopScaffold extends StatelessWidget {
   const DesktopScaffold({super.key});
@@ -130,94 +131,15 @@ class DesktopScaffold extends StatelessWidget {
               width: 300,
               child: Container(
                 color: Theme.of(context).cardColor,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 40),
-                    // User Avatar (Large)
-                    Obx(() {
-                      final user = authController.currentUser.value;
-                      final token = Get.find<AuthClient>().accessToken.value;
-                      return UserAvatar(
-                        profileImageUrl: user?.profileImageMediaId != null
-                            ? ApiEndpoints.makeProfileImageUrl(
-                                user!.profileImageMediaId!,
-                              )
-                            : null,
-                        authToken: token,
-                        initials: user?.initials ?? '?',
-                        radius: 40,
-                        backgroundColor: Colors.deepPurpleAccent,
-                        textStyle: const TextStyle(
-                          fontSize: 24,
-                          color: Colors.white,
-                        ),
-                        status: UserPresenceStatus.available,
-                        allowUpload: true,
-                        userId: user?.id,
-                      );
-                    }),
-                    const SizedBox(height: 16),
-                    // User Name
-                    Obx(() {
-                      final user = authController.currentUser.value;
-                      return Text(
-                        user?.fullName ?? 'Loading...',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }),
-                    // Email / Role
-                    Obx(() {
-                      final user = authController.currentUser.value;
-                      return Text(
-                        user?.email ?? '',
-                        style: const TextStyle(color: Colors.grey),
-                      );
-                    }),
-                    const SizedBox(height: 40),
-                    ListTile(
-                      leading: const Icon(Icons.settings),
-                      title: Text('profile_settings'.tr),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.language),
-                      title: const Text('Change Language'),
-                      onTap: () {
-                        var locale = Get.locale?.languageCode == 'en'
-                            ? const Locale('hi', 'IN')
-                            : const Locale('en', 'US');
-                        Get.updateLocale(locale);
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.brightness_6),
-                      title: const Text('Toggle Theme'),
-                      onTap: () {
-                        if (Get.isDarkMode) {
-                          Get.changeThemeMode(ThemeMode.light);
-                        } else {
-                          Get.changeThemeMode(ThemeMode.dark);
-                        }
-                      },
-                    ),
-                    const Spacer(),
-                    ListTile(
-                      leading: const Icon(Icons.logout, color: Colors.red),
-                      title: Text(
-                        'profile_logout'.tr,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      onTap: authController.logout,
-                    ),
+                child: ProfileMenuContent(
+                  useSpacer: true,
+                  onClose: navController.toggleDeck,
+                  footerItems: [
                     ListTile(
                       leading: const Icon(Icons.close),
-                      title: const Text('Close Deck'),
+                      title: Text('close_deck'.tr),
                       onTap: navController.toggleDeck,
                     ),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),

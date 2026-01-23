@@ -1,14 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'auth_controller.dart';
+import '../../core/enums/gender_type.dart';
 
-class SignUpScreen extends StatelessWidget {
-  SignUpScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
   final AuthController authController = Get.find();
-  final TextEditingController nameController = TextEditingController();
+
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController(); // Added
+  final TextEditingController mobileController = TextEditingController();
+
+  DateTime? selectedDate;
+  GenderType selectedGender = GenderType.other;
+
+  bool isPasswordVisible = false;
+  String? confirmPasswordError;
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,50 +49,208 @@ class SignUpScreen extends StatelessWidget {
         child: Container(
           width: context.isPhone ? double.infinity : 400,
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'create_account'.tr,
-                style: Theme.of(context).textTheme.displayLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  hintText: 'Name',
-                  prefixIcon: Icon(Icons.person),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'create_account'.tr,
+                  style: Theme.of(context).textTheme.displayLarge,
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  hintText: 'email_hint'.tr,
-                  prefixIcon: const Icon(Icons.email),
+                const SizedBox(height: 24),
+
+                // General Error Message
+                Obx(() => authController.loginError.value != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(
+                          authController.loginError.value!,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : const SizedBox.shrink()),
+
+                const SizedBox(height: 8),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: Obx(() => TextField(
+                            controller: firstNameController,
+                            decoration: InputDecoration(
+                              labelText: 'First Name *',
+                              prefixIcon: const Icon(Icons.person),
+                              errorText:
+                                  authController.validationErrors['firstName'],
+                            ),
+                          )),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Obx(() => TextField(
+                            controller: lastNameController,
+                            decoration: InputDecoration(
+                              labelText: 'Last Name *',
+                              prefixIcon: const Icon(Icons.person_outline),
+                              errorText:
+                                  authController.validationErrors['lastName'],
+                            ),
+                          )),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'password_hint'.tr,
-                  prefixIcon: const Icon(Icons.lock),
+                const SizedBox(height: 16),
+
+                Obx(() => TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: 'email_hint'.tr + ' *',
+                        prefixIcon: const Icon(Icons.email),
+                        errorText: authController.validationErrors['email'],
+                      ),
+                    )),
+                const SizedBox(height: 16),
+
+                Obx(() => TextField(
+                      controller: passwordController,
+                      obscureText: !isPasswordVisible,
+                      decoration: InputDecoration(
+                        labelText: 'password_hint'.tr + ' *',
+                        prefixIcon: const Icon(Icons.lock),
+                        errorText: authController.validationErrors['password'],
+                      ),
+                    )),
+                const SizedBox(height: 16),
+
+                TextField(
+                  controller: confirmPasswordController,
+                  obscureText: !isPasswordVisible,
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password *',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    errorText: confirmPasswordError,
+                    suffixIcon: IconButton(
+                      icon: Icon(isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => authController.signup(
-                  nameController.text,
-                  emailController.text,
-                  passwordController.text,
+                const SizedBox(height: 16),
+
+                Obx(() => TextField(
+                      controller: mobileController,
+                      decoration: InputDecoration(
+                        labelText: 'Mobile (Optional)',
+                        prefixIcon: const Icon(Icons.phone),
+                        errorText: authController.validationErrors['mobile'],
+                      ),
+                      keyboardType: TextInputType.phone,
+                    )),
+                const SizedBox(height: 16),
+
+                // DOB Picker
+                InkWell(
+                  onTap: () => _selectDate(context),
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'DOB (Optional)',
+                      prefixIcon: Icon(Icons.calendar_today),
+                    ),
+                    child: Text(
+                      selectedDate != null
+                          ? "${selectedDate!.toLocal()}".split(' ')[0]
+                          : 'Select Date',
+                    ),
+                  ),
                 ),
-                child: Text('sign_up'.tr),
-              ),
-            ],
+                const SizedBox(height: 16),
+
+                // Gender Dropdown
+                DropdownButtonFormField<GenderType>(
+                  value: selectedGender,
+                  decoration: const InputDecoration(
+                    labelText: 'Gender (Optional)',
+                    prefixIcon: Icon(Icons.wc),
+                  ),
+                  items: GenderType.values.map((GenderType type) {
+                    return DropdownMenuItem<GenderType>(
+                      value: type,
+                      child: Text(type.value),
+                    );
+                  }).toList(),
+                  onChanged: (GenderType? newValue) {
+                    setState(() {
+                      selectedGender = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 32),
+
+                Obx(() => authController.isLoading.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: () {
+                          authController.validationErrors.clear();
+                          bool isValid = true;
+                          if (firstNameController.text.trim().isEmpty) {
+                            authController.validationErrors['firstName'] =
+                                'Required';
+                            isValid = false;
+                          }
+                          if (lastNameController.text.trim().isEmpty) {
+                            authController.validationErrors['lastName'] =
+                                'Required';
+                            isValid = false;
+                          }
+                          if (emailController.text.trim().isEmpty) {
+                            authController.validationErrors['email'] =
+                                'Required';
+                            isValid = false;
+                          }
+                          if (passwordController.text.isEmpty) {
+                            authController.validationErrors['password'] =
+                                'Required';
+                            isValid = false;
+                          }
+
+                          if (!isValid) return;
+
+                          if (passwordController.text !=
+                              confirmPasswordController.text) {
+                            setState(() {
+                              confirmPasswordError = 'Passwords do not match';
+                            });
+                            return;
+                          }
+                          // Clear error if valid
+                          setState(() {
+                            confirmPasswordError = null;
+                          });
+                          authController.signup(
+                            firstName: firstNameController.text,
+                            lastName: lastNameController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
+                            mobile: mobileController.text.isNotEmpty
+                                ? mobileController.text
+                                : null,
+                            dob: selectedDate,
+                            gender: selectedGender,
+                          );
+                        },
+                        child: Text('sign_up'.tr),
+                      )),
+              ],
+            ),
           ),
         ),
       ),

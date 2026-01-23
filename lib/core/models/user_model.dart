@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../enums/user_status_type.dart';
-import '../enums/gender.dart';
+import '../enums/gender_type.dart';
 import '../enums/profile_type.dart';
+import '../enums/user_language_type.dart';
 import 'privacy_settings.dart';
 import 'notification_settings.dart';
 
@@ -12,10 +13,11 @@ class UserModel {
   final String userName;
   final String email;
   final String mobile;
-  final Gender gender;
+  final GenderType gender;
   final DateTime? dob;
   final ProfileType profileType;
   final UserStatusType status;
+  final UserLanguageType userLanguage;
   final String? profileImageMediaId;
   final PrivacySettings privacySettings;
   final NotificationSettings notificationSettings;
@@ -31,6 +33,7 @@ class UserModel {
     this.dob,
     required this.profileType,
     required this.status,
+    required this.userLanguage,
     this.profileImageMediaId,
     required this.privacySettings,
     required this.notificationSettings,
@@ -59,12 +62,15 @@ class UserModel {
       userName: getValue('userName', altKeys: ['username', 'user_name']) ?? '',
       email: getValue('email') ?? '',
       mobile: getValue('mobile') ?? '',
-      gender: Gender.fromString(getValue('gender') ?? 'OTHER'),
+      gender: GenderType.fromString(getValue('gender') ?? 'OTHER'),
       dob: json['dob'] != null ? DateTime.tryParse(json['dob']) : null,
       profileType: ProfileType.fromString(
           getValue('profileType', altKeys: ['profile_type', 'type']) ??
               'public'),
       status: UserStatusType.fromValue(getValue('status') ?? 'offline'),
+      userLanguage: UserLanguageType.fromString(
+          getValue('userLanguage', altKeys: ['user_language', 'language']) ??
+              'English'),
       profileImageMediaId: getValue('profileImageMediaId',
           altKeys: ['profile_image_media_id', 'mediaId', 'avatarId']),
       privacySettings: PrivacySettings.fromJson(json['privacySettings'] ?? {}),
@@ -86,10 +92,11 @@ class UserModel {
     String? userName,
     String? email,
     String? mobile,
-    Gender? gender,
+    GenderType? gender,
     DateTime? dob,
     ProfileType? profileType,
     UserStatusType? status,
+    UserLanguageType? userLanguage,
     String? profileImageMediaId,
     PrivacySettings? privacySettings,
     NotificationSettings? notificationSettings,
@@ -105,6 +112,7 @@ class UserModel {
       dob: dob ?? this.dob,
       profileType: profileType ?? this.profileType,
       status: status ?? this.status,
+      userLanguage: userLanguage ?? this.userLanguage,
       profileImageMediaId: profileImageMediaId ?? this.profileImageMediaId,
       privacySettings: privacySettings ?? this.privacySettings,
       notificationSettings: notificationSettings ?? this.notificationSettings,

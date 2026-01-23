@@ -10,6 +10,7 @@ import '../../shared/widgets/user_avatar.dart';
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/auth_client.dart';
 import '../../core/enums/user_presence_status.dart';
+import '../../shared/widgets/profile_menu_content.dart';
 
 class MobileScaffold extends StatelessWidget {
   const MobileScaffold({super.key});
@@ -103,91 +104,15 @@ class _ProfileDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthController authController = Get.find();
+    // final AuthController authController = Get.find(); // Not used anymore
 
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          Obx(() {
-            final user = authController.currentUser.value;
-            final token = Get.find<AuthClient>().accessToken.value;
-            return Container(
-              color: Theme.of(context).cardColor,
-              padding: const EdgeInsets.symmetric(vertical: 40),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  UserAvatar(
-                    profileImageUrl: user?.profileImageMediaId != null
-                        ? ApiEndpoints.makeProfileImageUrl(
-                            user!.profileImageMediaId!,
-                          )
-                        : null,
-                    authToken: token,
-                    initials: user?.initials ?? '?',
-                    radius: 40,
-                    backgroundColor: Colors.deepPurpleAccent,
-                    textStyle: const TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                    ),
-                    status: UserPresenceStatus.available,
-                    allowUpload: true,
-                    userId: user?.id,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    user?.fullName ?? 'Loading...',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    user?.email ?? '',
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            );
-          }),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: Text('profile_settings'.tr),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: const Icon(Icons.language),
-            title: const Text('Change Language'),
-            onTap: () {
-              var locale = Get.locale?.languageCode == 'en'
-                  ? const Locale('hi', 'IN')
-                  : const Locale('en', 'US');
-              Get.updateLocale(locale);
-              Get.back();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.brightness_6),
-            title: const Text('Toggle Theme'),
-            onTap: () {
-              if (Get.isDarkMode) {
-                Get.changeThemeMode(ThemeMode.light);
-              } else {
-                Get.changeThemeMode(ThemeMode.dark);
-              }
-              Get.back();
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: Text(
-              'profile_logout'.tr,
-              style: const TextStyle(color: Colors.red),
-            ),
-            onTap: authController.logout,
+          ProfileMenuContent(
+            onClose: Get.back,
+            useSpacer: false, // Mobile fits content naturally
           ),
         ],
       ),

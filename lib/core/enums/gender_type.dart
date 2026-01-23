@@ -1,16 +1,16 @@
-enum Gender {
+enum GenderType {
   unknown('Unknown'),
   male('Male'),
   female('Female'),
   other('Other');
 
   final String value;
-  const Gender(this.value);
+  const GenderType(this.value);
 
-  static Gender fromString(String? key) {
-    return Gender.values.firstWhere(
+  static GenderType fromString(String? key) {
+    return GenderType.values.firstWhere(
       (e) => e.value.toLowerCase() == (key?.toLowerCase() ?? ''),
-      orElse: () => Gender.unknown,
+      orElse: () => GenderType.unknown,
     );
   }
 }

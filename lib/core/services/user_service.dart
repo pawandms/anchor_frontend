@@ -33,6 +33,32 @@ class UserService extends GetxService {
     return null;
   }
 
+  Future<bool> updateUserProfile(
+      String userId, Map<String, dynamic> data) async {
+    try {
+      final url = ApiEndpoints.updateUserInfo(userId);
+
+      final response = await _authClient.authenticatedRequest(
+        'POST',
+        url,
+        body: data,
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('UserService: Profile updated successfully');
+        return true;
+      } else {
+        debugPrint(
+          'Update Profile Failed: ${response.statusCode} - ${response.bodyString}',
+        );
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Update Profile Error: $e');
+      return false;
+    }
+  }
+
   Future<String?> uploadProfileImage(String userId, XFile imageFile) async {
     final url = ApiEndpoints.uploadProfileImage(userId);
     debugPrint('UserService: Uploading image to $url');

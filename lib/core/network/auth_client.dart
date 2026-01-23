@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/api_endpoints.dart';
+import '../models/api_error_response.dart';
+import '../../shared/screens/server_side_error_screen.dart';
 
 class AuthClient extends GetConnect {
   // Environment Variables
@@ -25,6 +27,16 @@ class AuthClient extends GetConnect {
     // Initialize token from storage
     SharedPreferences.getInstance().then((prefs) {
       accessToken.value = prefs.getString('access_token');
+    });
+
+    // Global Error Handling
+    httpClient.addResponseModifier((request, response) {
+      if (response.statusCode == 500) {
+        Get.to(() => ServerSideErrorScreen(
+              errorDetails: response.bodyString ?? 'Unknown Server Error',
+            ));
+      }
+      return response;
     });
   }
 
@@ -49,7 +61,7 @@ class AuthClient extends GetConnect {
 
   // --- Auth Actions ---
 
-  Future<bool> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     final String basicAuth =
         'Basic ${base64Encode(utf8.encode('$_clientId:$_clientSecret'))}';
 
@@ -74,16 +86,20 @@ class AuthClient extends GetConnect {
         } else if (data is String) {
           await _saveTokens(jsonDecode(data));
         }
-        return true;
+        return {'success': true};
       } else {
         debugPrint(
           'Login Failed: ${response.statusCode} - ${response.bodyString}',
         );
-        return false;
+        return {
+          'success': false,
+          'message': response.bodyString ?? 'Unknown error',
+          'statusCode': response.statusCode
+        };
       }
     } catch (e) {
       debugPrint('Login Error: $e');
-      return false;
+      return {'success': false, 'message': e.toString(), 'statusCode': 500};
     }
   }
 
@@ -92,6 +108,51 @@ class AuthClient extends GetConnect {
     await prefs.clear();
     accessToken.value = null;
     Get.offAllNamed('/login');
+  }
+
+  Future<Map<String, dynamic>> signup(Map<String, dynamic> data) async {
+    // URL from ApiEndpoints
+    final url = ApiEndpoints.signup;
+
+    try {
+      final response = await post(url, data);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'success': true};
+      } else if (response.statusCode == 400) {
+        // Validation Error
+        try {
+          // Check if body is Map, if not decode
+          final bodyData = response.body is String
+              ? jsonDecode(response.body)
+              : response.body;
+
+          final apiError = ApiErrorResponse.fromJson(bodyData);
+          return {
+            'success': false,
+            'message': apiError.message,
+            'statusCode': 400,
+            'validationErrors': apiError.errors // List of ApiValidationError
+          };
+        } catch (e) {
+          debugPrint('Error Parsing 400 response: $e');
+          return {
+            'success': false,
+            'message': response.bodyString ?? 'Validation failed',
+            'statusCode': 400
+          };
+        }
+      } else {
+        return {
+          'success': false,
+          'message': response.bodyString ?? 'Signup failed',
+          'statusCode': response.statusCode
+        };
+      }
+    } catch (e) {
+      debugPrint('Signup Error: $e');
+      return {'success': false, 'message': e.toString(), 'statusCode': 500};
+    }
   }
 
   // --- Token Management ---

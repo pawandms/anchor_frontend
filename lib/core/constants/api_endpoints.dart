@@ -10,6 +10,7 @@ class ApiEndpoints {
 
   // Auth
   static const String oauthToken = '/oauth2/token';
+  static const String signup = '/api/v1/public/signup';
 
   // Users
   static String userProfile(String userId) => '/api/v1/users/$userId/profile';
@@ -23,4 +24,7 @@ class ApiEndpoints {
 
   static String uploadProfileImage(String userId) =>
       '/api/v1/users/$userId/media/profile-image';
+
+  static String updateUserInfo(String userId) =>
+      '/api/v1/users/$userId/user-info';
 }

@@ -45,20 +45,41 @@ class SignInScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => authController.login(
-                  emailController.text,
-                  passwordController.text,
-                ),
-                child: Text('sign_in'.tr),
-              ),
+
+              // Error Message
+              Obx(() => authController.loginError.value != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        authController.loginError.value!,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : const SizedBox.shrink()),
+
+              Obx(() => authController.isLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : ElevatedButton(
+                      onPressed: () => authController.login(
+                        emailController.text,
+                        passwordController.text,
+                      ),
+                      child: Text('sign_in'.tr),
+                    )),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () => Get.toNamed('/forgot_password'),
+                onPressed: () {
+                  authController.loginError.value = null; // Clear error on nav
+                  Get.toNamed('/forgot_password');
+                },
                 child: Text('forgot_password'.tr),
               ),
               TextButton(
-                onPressed: () => Get.toNamed('/signup'),
+                onPressed: () {
+                  authController.loginError.value = null;
+                  Get.toNamed('/signup');
+                },
                 child: Text('create_account'.tr),
               ),
             ],
