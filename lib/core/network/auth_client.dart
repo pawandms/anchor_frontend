@@ -99,7 +99,13 @@ class AuthClient extends GetConnect {
       }
     } catch (e) {
       debugPrint('Login Error: $e');
-      return {'success': false, 'message': e.toString(), 'statusCode': 500};
+      String errorMessage = e.toString();
+      if (errorMessage.contains('SocketException') ||
+          errorMessage.contains('Connection refused') ||
+          errorMessage.contains('Connection timed out')) {
+        errorMessage = 'network_error_message'.tr;
+      }
+      return {'success': false, 'message': errorMessage, 'statusCode': 500};
     }
   }
 

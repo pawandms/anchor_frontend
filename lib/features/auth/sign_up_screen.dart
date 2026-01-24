@@ -45,13 +45,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(leading: BackButton(onPressed: () => Get.back())),
-      body: Center(
+      body: Align(
+        alignment: Alignment.topCenter,
         child: Container(
           width: context.isPhone ? double.infinity : 400,
           padding: const EdgeInsets.all(24),
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(

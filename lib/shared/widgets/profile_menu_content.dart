@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../features/auth/auth_controller.dart';
-import '../../features/profile/screens/change_language_screen.dart';
+import '../../features/profile/controllers/user_controller.dart';
+
+import '../../features/profile/screens/profile_screen.dart';
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/auth_client.dart';
 import '../../core/enums/user_presence_status.dart';
@@ -21,6 +23,7 @@ class ProfileMenuContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final UserController userController = Get.find<UserController>();
     final AuthController authController = Get.find<AuthController>();
 
     return Column(
@@ -29,46 +32,64 @@ class ProfileMenuContent extends StatelessWidget {
 
         // User Info Section
         Obx(() {
-          final user = authController.currentUser.value;
+          final user = userController.currentUser.value;
           final token = Get.find<AuthClient>().accessToken.value;
 
-          return Container(
-            padding:
-                useSpacer ? null : const EdgeInsets.symmetric(vertical: 40),
-            color: useSpacer ? null : Theme.of(context).cardColor,
-            child: Column(
-              children: [
-                UserAvatar(
-                  profileImageUrl: user?.profileImageMediaId != null
-                      ? ApiEndpoints.makeProfileImageUrl(
-                          user!.profileImageMediaId!,
-                        )
-                      : null,
-                  authToken: token,
-                  initials: user?.initials ?? '?',
-                  radius: 40,
-                  backgroundColor: Colors.deepPurpleAccent,
-                  textStyle: const TextStyle(
-                    fontSize: 24,
-                    color: Colors.white,
+          return InkWell(
+            onTap: () {
+              onClose?.call();
+              Get.to(() => const ProfileScreen());
+            },
+            child: Container(
+              padding:
+                  useSpacer ? null : const EdgeInsets.symmetric(vertical: 40),
+              color: useSpacer ? null : Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        UserAvatar(
+                          profileImageUrl: user?.profileImageMediaId != null
+                              ? ApiEndpoints.makeProfileImageUrl(
+                                  user!.profileImageMediaId!,
+                                )
+                              : null,
+                          authToken: token,
+                          initials: user?.initials ?? '?',
+                          radius: 40,
+                          backgroundColor: Colors.deepPurpleAccent,
+                          textStyle: const TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                          ),
+                          status: UserPresenceStatus.available,
+                          allowUpload: true,
+                          userId: user?.id,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          (user?.nickName != null && user!.nickName.isNotEmpty)
+                              ? user.nickName
+                              : (user?.fullName ?? 'loading'.tr),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          user?.email ?? '',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
-                  status: UserPresenceStatus.available,
-                  allowUpload: true,
-                  userId: user?.id,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  user?.fullName ?? 'loading'.tr,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  const Padding(
+                    padding: EdgeInsets.only(right: 16.0),
+                    child: Icon(Icons.chevron_right, color: Colors.grey),
                   ),
-                ),
-                Text(
-                  user?.email ?? '',
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }),
@@ -76,22 +97,6 @@ class ProfileMenuContent extends StatelessWidget {
         if (useSpacer) const SizedBox(height: 40),
 
         // Menu Items
-        ListTile(
-          leading: const Icon(Icons.settings),
-          title: Text('profile_settings'.tr),
-          onTap: () {
-            // Navigate to settings
-            onClose?.call();
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.language),
-          title: Text('change_language'.tr),
-          onTap: () {
-            onClose?.call();
-            Get.to(() => const ChangeLanguageScreen());
-          },
-        ),
         ListTile(
           leading: const Icon(Icons.brightness_6),
           title: Text('toggle_theme'.tr),

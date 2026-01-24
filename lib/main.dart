@@ -12,6 +12,7 @@ import 'features/auth/sign_in_screen.dart';
 import 'features/auth/sign_up_screen.dart';
 import 'features/auth/forgot_password_screen.dart';
 import 'features/auth/auth_controller.dart';
+import 'features/profile/controllers/user_controller.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -43,6 +44,7 @@ class AnchorApp extends StatelessWidget {
         Get.put(AuthClient());
         Get.put(AuthService());
         Get.put(UserService());
+        Get.put(UserController());
         Get.put(NavController());
         Get.put(AuthController());
       }),

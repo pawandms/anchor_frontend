@@ -10,6 +10,7 @@ class UserModel {
   final String id;
   final String firstName;
   final String lastName;
+  final String nickName;
   final String userName;
   final String email;
   final String mobile;
@@ -26,6 +27,7 @@ class UserModel {
     required this.id,
     required this.firstName,
     required this.lastName,
+    required this.nickName,
     required this.userName,
     required this.email,
     required this.mobile,
@@ -59,6 +61,7 @@ class UserModel {
       id: getValue('id') ?? '',
       firstName: getValue('firstName', altKeys: ['first_name']) ?? '',
       lastName: getValue('lastName', altKeys: ['last_name']) ?? '',
+      nickName: getValue('nickName', altKeys: ['nick_name']) ?? '',
       userName: getValue('userName', altKeys: ['username', 'user_name']) ?? '',
       email: getValue('email') ?? '',
       mobile: getValue('mobile') ?? '',
@@ -89,6 +92,7 @@ class UserModel {
     String? id,
     String? firstName,
     String? lastName,
+    String? nickName,
     String? userName,
     String? email,
     String? mobile,
@@ -105,6 +109,7 @@ class UserModel {
       id: id ?? this.id,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
+      nickName: nickName ?? this.nickName,
       userName: userName ?? this.userName,
       email: email ?? this.email,
       mobile: mobile ?? this.mobile,

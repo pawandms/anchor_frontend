@@ -1,23 +1,20 @@
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:ui';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/services/auth_service.dart';
-import '../../core/services/user_service.dart';
-import '../../core/models/user_model.dart';
-import '../../core/enums/user_language_type.dart';
 import '../../core/enums/gender_type.dart';
 import '../../core/models/api_error_response.dart';
+import '../../shared/screens/server_side_error_screen.dart';
+import '../profile/controllers/user_controller.dart';
 
 class AuthController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
-  final UserService _userService = Get.find<UserService>();
+  final UserController _userController = Get.find<UserController>();
   var isLoggedIn = false.obs;
   var isLoading = false.obs;
   var loginError = RxnString();
   var validationErrors =
       <String, String>{}.obs; // FieldName -> Translate Message
-  Rx<UserModel?> currentUser = Rx<UserModel?>(null);
 
   @override
   void onInit() {
@@ -37,7 +34,7 @@ class AuthController extends GetxController {
     if (token != null) {
       isLoggedIn.value = true;
       Get.offAllNamed('/home');
-      _fetchUserProfile();
+      _userController.fetchUserProfile();
     } else {
       isLoggedIn.value = false;
       Get.offAllNamed('/login');
@@ -54,42 +51,20 @@ class AuthController extends GetxController {
       if (result['success'] == true) {
         isLoggedIn.value = true;
         Get.offAllNamed('/home');
-        _fetchUserProfile();
+        _userController.fetchUserProfile();
       } else {
-        loginError.value = result['message'] ?? 'Login failed';
+        if (result['statusCode'] == 401) {
+          loginError.value = 'invalid_credentials'.tr;
+        } else if (result['statusCode'] == 500) {
+          Get.to(() => ServerSideErrorScreen(
+                errorDetails: result['message'] ?? 'Unknown Error',
+              ));
+        } else {
+          loginError.value = result['message'] ?? 'Login failed';
+        }
       }
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  Future<void> _fetchUserProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userID');
-    debugPrint('AuthController: Fetching profile for userId: $userId');
-
-    if (userId != null) {
-      try {
-        final profileData = await _userService.getUserProfile(userId);
-        if (profileData != null) {
-          debugPrint('AuthController: Profile data received. Parsing...');
-          currentUser.value = UserModel.fromJson(profileData);
-
-          // Set locale based on user language
-          if (currentUser.value != null) {
-            _updateLocale(currentUser.value!.userLanguage);
-          }
-
-          debugPrint(
-              'AuthController: Profile parsed. User: ${currentUser.value?.fullName}');
-        } else {
-          debugPrint('AuthController: Profile data is NULL');
-        }
-      } catch (e) {
-        debugPrint('AuthController: Error fetching/parsing profile: $e');
-      }
-    } else {
-      debugPrint('AuthController: No userId found in SharedPreferences');
     }
   }
 
@@ -126,13 +101,9 @@ class AuthController extends GetxController {
         if (result['validationErrors'] != null) {
           final List<ApiValidationError> errors = result['validationErrors'];
           for (var error in errors) {
-            // Map fieldName to translated error message
-            // error.errorCode should be the key in TranslationService (e.g. Email_Already_Present)
-            // If translation not found, fallback to fieldName + error.errorCode or generic
             validationErrors[error.fieldName] = error.errorCode.tr;
           }
         }
-        // Use inline error instead of snackbar
         loginError.value = result['message'] ?? 'Signup failed';
       }
     } finally {
@@ -143,57 +114,7 @@ class AuthController extends GetxController {
   void logout() async {
     await _authService.logout();
     isLoggedIn.value = false;
-    currentUser.value = null;
-  }
-
-  void updateProfileImage(String mediaId) {
-    debugPrint(
-        'AuthController: Updating profile image state with mediaId: $mediaId');
-    if (currentUser.value != null) {
-      currentUser.value =
-          currentUser.value!.copyWith(profileImageMediaId: mediaId);
-      currentUser.refresh(); // Explicitly notify listeners
-      debugPrint(
-          'AuthController: Profile image updated and listeners notified.');
-    } else {
-      debugPrint(
-          'AuthController: Cannot update profile image. Current user is null.');
-    }
-  }
-
-  void updateUserLanguage(UserLanguageType language) async {
-    if (currentUser.value == null) return;
-
-    // Optimistic update
-    final previousLanguage = currentUser.value!.userLanguage;
-    currentUser.value = currentUser.value!.copyWith(userLanguage: language);
-    _updateLocale(language);
-
-    bool success = await _userService.updateUserProfile(
-      currentUser.value!.id,
-      {'userLanguage': language.value},
-    );
-
-    if (!success) {
-      Get.snackbar('Error', 'Failed to update language preference');
-      // Revert
-      currentUser.value =
-          currentUser.value!.copyWith(userLanguage: previousLanguage);
-      _updateLocale(previousLanguage);
-    }
-  }
-
-  void _updateLocale(UserLanguageType language) {
-    Locale locale;
-    switch (language) {
-      case UserLanguageType.hindi:
-        locale = const Locale('hi', 'IN');
-        break;
-      default:
-        locale = const Locale('en', 'US');
-        break;
-    }
-    Get.updateLocale(locale);
+    _userController.clearUser();
   }
 
   void forgotPassword(String email) {

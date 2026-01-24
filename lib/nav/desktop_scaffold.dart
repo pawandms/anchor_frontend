@@ -5,7 +5,7 @@ import '../features/chat/chat_list_screen.dart';
 import '../features/channels/video_channels_screen.dart';
 import '../features/reels/reels_feed_screen.dart';
 import 'nav_controller.dart';
-import '../features/auth/auth_controller.dart';
+import '../features/profile/controllers/user_controller.dart';
 import '../../shared/widgets/user_avatar.dart';
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/auth_client.dart';
@@ -18,7 +18,7 @@ class DesktopScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final NavController navController = Get.find();
-    final AuthController authController = Get.find();
+    final UserController userController = Get.find();
 
     final List<Widget> screens = const [
       ActivityScreen(),
@@ -45,7 +45,7 @@ class DesktopScaffold extends StatelessWidget {
                     InkWell(
                       onTap: navController.toggleDeck,
                       child: Obx(() {
-                        final user = authController.currentUser.value;
+                        final user = userController.currentUser.value;
                         final token = Get.find<AuthClient>().accessToken.value;
                         return UserAvatar(
                           profileImageUrl: user?.profileImageMediaId != null

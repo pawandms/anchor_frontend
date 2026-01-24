@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/enums/user_presence_status.dart';
-import '../../features/auth/auth_controller.dart';
+import '../../features/profile/controllers/user_controller.dart';
 import '../../core/services/user_service.dart';
 import '../../core/constants/api_endpoints.dart';
 
@@ -73,9 +73,9 @@ class UserAvatar extends StatelessWidget {
         }
 
         // Update Global State triggers parent rebuild
-        if (Get.isRegistered<AuthController>()) {
-          final authController = Get.find<AuthController>();
-          authController.updateProfileImage(mediaId);
+        if (Get.isRegistered<UserController>()) {
+          final userController = Get.find<UserController>();
+          userController.updateProfileImage(mediaId);
           // Increment tick to force refresh on all avatars
           profileRefreshTick.value++;
         }
@@ -198,9 +198,9 @@ class UserAvatar extends StatelessWidget {
       String? currentUrl = profileImageUrl;
 
       // Reactive update: Check if this avatar belongs to the current user
-      if (userId != null && Get.isRegistered<AuthController>()) {
-        final authController = Get.find<AuthController>();
-        final currentUser = authController.currentUser.value;
+      if (userId != null && Get.isRegistered<UserController>()) {
+        final userController = Get.find<UserController>();
+        final currentUser = userController.currentUser.value;
         if (currentUser != null && currentUser.id == userId) {
           final mediaId = currentUser.profileImageMediaId;
           // Subscribe to static tick to force update
@@ -211,14 +211,14 @@ class UserAvatar extends StatelessWidget {
         }
       }
 
-      if (currentUrl != null && currentUrl!.isNotEmpty) {
+      if (currentUrl != null && currentUrl.isNotEmpty) {
         return ClipOval(
           child: Container(
             width: radius * 2,
             height: radius * 2,
             color: backgroundColor ?? Colors.grey.shade300,
             child: Image.network(
-              currentUrl!,
+              currentUrl,
               headers: authToken != null
                   ? {'Authorization': 'Bearer $authToken'}
                   : null,
