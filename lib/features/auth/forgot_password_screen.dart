@@ -26,10 +26,10 @@ class ForgotPasswordScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Enter your email or mobile number to receive a reset link.",
+              Text(
+                'forgot_password_instruction'.tr,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 32),
               TextField(

@@ -82,7 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Obx(() => TextField(
                             controller: firstNameController,
                             decoration: InputDecoration(
-                              labelText: 'First Name *',
+                              labelText: 'first_name'.tr + ' *',
                               prefixIcon: const Icon(Icons.person),
                               errorText:
                                   authController.validationErrors['firstName'],
@@ -94,7 +94,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Obx(() => TextField(
                             controller: lastNameController,
                             decoration: InputDecoration(
-                              labelText: 'Last Name *',
+                              labelText: 'last_name'.tr + ' *',
                               prefixIcon: const Icon(Icons.person_outline),
                               errorText:
                                   authController.validationErrors['lastName'],
@@ -130,7 +130,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: confirmPasswordController,
                   obscureText: !isPasswordVisible,
                   decoration: InputDecoration(
-                    labelText: 'Confirm Password *',
+                    labelText: 'confirm_password'.tr + ' *',
                     prefixIcon: const Icon(Icons.lock_outline),
                     errorText: confirmPasswordError,
                     suffixIcon: IconButton(
@@ -150,7 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Obx(() => TextField(
                       controller: mobileController,
                       decoration: InputDecoration(
-                        labelText: 'Mobile (Optional)',
+                        labelText: 'mobile_optional'.tr,
                         prefixIcon: const Icon(Icons.phone),
                         errorText: authController.validationErrors['mobile'],
                       ),
@@ -162,14 +162,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 InkWell(
                   onTap: () => _selectDate(context),
                   child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'DOB (Optional)',
-                      prefixIcon: Icon(Icons.calendar_today),
+                    decoration: InputDecoration(
+                      labelText: 'dob_optional'.tr,
+                      prefixIcon: const Icon(Icons.calendar_today),
                     ),
                     child: Text(
                       selectedDate != null
                           ? "${selectedDate!.toLocal()}".split(' ')[0]
-                          : 'Select Date',
+                          : 'select_date'.tr,
                     ),
                   ),
                 ),
@@ -178,14 +178,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // Gender Dropdown
                 DropdownButtonFormField<GenderType>(
                   value: selectedGender,
-                  decoration: const InputDecoration(
-                    labelText: 'Gender (Optional)',
-                    prefixIcon: Icon(Icons.wc),
+                  decoration: InputDecoration(
+                    labelText: 'gender_optional'.tr,
+                    prefixIcon: const Icon(Icons.wc),
                   ),
                   items: GenderType.values.map((GenderType type) {
                     return DropdownMenuItem<GenderType>(
                       value: type,
-                      child: Text(type.value),
+                      child: Text(type.localizedName),
                     );
                   }).toList(),
                   onChanged: (GenderType? newValue) {
@@ -204,22 +204,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           bool isValid = true;
                           if (firstNameController.text.trim().isEmpty) {
                             authController.validationErrors['firstName'] =
-                                'Required';
+                                'field_required'.tr;
                             isValid = false;
                           }
                           if (lastNameController.text.trim().isEmpty) {
                             authController.validationErrors['lastName'] =
-                                'Required';
+                                'field_required'.tr;
                             isValid = false;
                           }
                           if (emailController.text.trim().isEmpty) {
                             authController.validationErrors['email'] =
-                                'Required';
+                                'field_required'.tr;
                             isValid = false;
                           }
                           if (passwordController.text.isEmpty) {
                             authController.validationErrors['password'] =
-                                'Required';
+                                'field_required'.tr;
                             isValid = false;
                           }
 
@@ -228,7 +228,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           if (passwordController.text !=
                               confirmPasswordController.text) {
                             setState(() {
-                              confirmPasswordError = 'Passwords do not match';
+                              confirmPasswordError = 'passwords_not_match'.tr;
                             });
                             return;
                           }

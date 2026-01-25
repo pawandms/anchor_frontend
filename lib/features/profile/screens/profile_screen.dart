@@ -110,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 600),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 100.0),
             child: Obx(() {
               // Reactive rebuild when user data changes
               final user = _userController.currentUser.value;
@@ -234,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             '${user?.firstName ?? ''} ${user?.lastName ?? ''}'),
         _buildViewRow('nickname'.tr, user?.nickName ?? ''),
         _buildViewRow('mobile_label'.tr, user?.mobile ?? ''),
-        _buildViewRow('gender'.tr, user?.gender?.value ?? 'N/A'),
+        _buildViewRow('gender'.tr, user?.gender?.localizedName ?? 'N/A'),
         _buildViewRow(
             'date_of_birth'.tr,
             user?.dob != null
@@ -321,8 +321,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: InputDecoration(
                 labelText: 'gender'.tr, border: const OutlineInputBorder()),
             items: GenderType.values
-                .map((type) =>
-                    DropdownMenuItem(value: type, child: Text(type.value)))
+                .map((type) => DropdownMenuItem(
+                    value: type, child: Text(type.localizedName)))
                 .toList(),
             onChanged: (val) => setState(() => _selectedGender = val),
           ),
@@ -373,7 +373,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         prefixIcon: Icon(Icons.language),
       ),
       items: UserLanguageType.values
-          .map((type) => DropdownMenuItem(value: type, child: Text(type.value)))
+          .map((type) => DropdownMenuItem(
+              value: type, child: Text('${type.nativeName} (${type.value})')))
           .toList(),
       onChanged: (val) {
         if (val != null) {

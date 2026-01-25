@@ -1,9 +1,10 @@
 enum UserLanguageType {
-  english('English'),
-  hindi('Hindi');
+  english('English', 'English'),
+  hindi('Hindi', 'हिन्दी');
 
   final String value;
-  const UserLanguageType(this.value);
+  final String nativeName;
+  const UserLanguageType(this.value, this.nativeName);
 
   static UserLanguageType fromString(String value) {
     return UserLanguageType.values.firstWhere(
